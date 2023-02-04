@@ -22,8 +22,8 @@ create database veganmall;
 use veganmall;
 paste the queries from veganmall_2023-01-15.sql and execute;
 
-2. Springboot API Deployment:
-2.1
+2. Springboot API Deployment
+
 cd backend
 kubectl create cm vegan-cm --from-file=application.properties -nvegan
 (Create a configmap file to mount the springboot configuration file）
@@ -44,7 +44,7 @@ Kubectl apply –f . （Execute the backend.yaml pvc.yaml rbac.yaml service.yaml
 test: http://ip:port
 
 
-3. React API Deployment:
+3 React API Deployment:
 
 cd frontend
 Kubectl apply –f .    (execute all the yaml files in the folder)
@@ -59,7 +59,7 @@ veganfront/src/redux/constant.js
 
 
 
-4. Network policy Deployment:
+4 Network policy Deployment:
 cd ../
 kubectl apply -f NP.yaml (only those labeled with veganpro is allowed to visit)
 
