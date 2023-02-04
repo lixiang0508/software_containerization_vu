@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc{{ .Values.veganpro.nameOverride }}1-nfs
+  labels:
+    app: pvc{{ .Values.veganpro.nameOverride }}1-nfs
+spec:
+{{- toYaml .Values.persistence.data | nindent 2 }}

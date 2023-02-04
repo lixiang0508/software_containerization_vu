@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{include "veganpro.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- if .Values.canary.enable }}
+    {{- include "veganpro.labels.false" . | nindent 4 }}
+    {{- end }}
+    {{- if not .Values.canary.enable }}
+    {{- include "veganpro.labels" . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- if .Values.canary.enable }}
+      {{- include "veganpro.selectlabels.false" . | nindent 6 }}
+      {{- end }}
+      {{- if not .Values.canary.enable }}
+      {{- include "veganpro.selectorLabels" . | nindent 6 }}
+      {{- end }}
+  replicas: {{ .Values.veganpro.replicaCount }}
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      {{- toYaml .Values.veganpro.rollingUpdate | nindent 6 }}
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        {{- if .Values.canary.enable }}
+        {{- include "veganpro.labels.false" . | nindent 8 }}
+        {{- end }}
+        {{- if not .Values.canary.enable }}
+        {{- include "veganpro.labels" . | nindent 8 }}
+        {{- end }}
+    spec:
+      containers:
+        - name: veganpro
+          image: {{ .Values.veganpro.image.repository }}:{{ .Values.veganpro.image.tag }}
+          imagePullPolicy: IfNotPresent
+          {{- if .Values.veganpro.resources.enable }}
+          resources:
+            requests:
+              {{- toYaml .Values.veganpro.requests  | nindent 14 }}
+            limits:
+              {{- toYaml .Values.veganpro.limits  | nindent 14 }}
+          {{- else }}
+            resources: {}
+          {{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.veganpro.serverPort }}
+            initialDelaySeconds: 45
+            timeoutSeconds: 45
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.veganpro.serverPort }}
+            initialDelaySeconds: 9
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 10
+          ports:
+            - containerPort: {{ .Values.veganpro.serverPort }}
+              name: veganpro 
+          volumeMounts:
+            - name: cmveganpro
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+              readOnly: true
+            - name: pvcveganpro
+              mountPath: /usr/local/nginx/html
+              subPath: dist/
+      volumes:
+        - name: cmveganpro 
+          configMap:
+            name: veganpro-cm
+        - name: pvcveganpro
+          {{- if not .Values.persistence.enable }}
+          emptyDir: { }
+          {{- end }}
+          {{- if .Values.persistence.enable }}
+          persistentVolumeClaim:
+            {{- toYaml .Values.persistence.persistentVolumeClaim | nindent 12 }}
+          {{- end }}

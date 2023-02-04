@@ -1,0 +1,19 @@
+{{- if .Values.canary.enable }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{include "veganpro.fullname" . }}-canary
+spec:
+  ports:
+  - protocol: TCP
+    port: {{ .Values.service.port }} 
+    targetPort: {{ .Values.service.targetPort }}
+    name: {{ .Values.veganpro.nameOverride }}-canary
+  selector:
+    {{- include "veganpro.selectorLabels" . | nindent 4 }}   
+  type: {{ .Values.service.type }}
+  {{- end }}
+  {{- if not .Values.canary.enable }}
+    null
+  {{- end }}
+

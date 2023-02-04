@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: veganpro-canary
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: veganpro-canary
+  selector:
+    track: canary
+  type: ClusterIP #NodePort #ClusterIP

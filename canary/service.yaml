@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: veganpro-stable
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: veganpro
+  selector:
+    track: stable
+  type: ClusterIP #NodePort #ClusterIP

@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{include "vegan.fullname" . }}
+  labels:
+    {{- include "vegan.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "vegan.selectorLabels" . | nindent 6 }}
+  replicas: {{ .Values.vegan.replicaCount }}
+  revisionHistoryLimit: 15
+  strategy:
+    rollingUpdate:
+{{- toYaml .Values.vegan.rollingUpdate | nindent 6 }}
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        {{- include "vegan.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: {{include "vegan.fullname" . }}
+        image: {{ .Values.vegan.image.repository }}:{{ .Values.vegan.image.tag }}
+        imagePullPolicy: IfNotPresent
+        {{- if .Values.vegan.resources.enable }}
+        resources:
+          requests:
+        {{- toYaml .Values.vegan.requests | nindent 12 }}
+          limits:
+        {{- toYaml .Values.vegan.limits | nindent 12 }}
+        {{- else}}
+        resources: {}
+        {{- end }}
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.vegan.serverPort }} 
+          initialDelaySeconds: 110
+          timeoutSeconds: 120
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe: 
+          tcpSocket:
+            port: {{ .Values.vegan.serverPort }}
+          initialDelaySeconds: 110
+          timeoutSeconds: 120
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        ports:
+        - containerPort: {{ .Values.vegan.serverPort }}
+          name:  veganport
+        volumeMounts:
+        - name: cmvegan
+          mountPath: /config
+        - name: pvcvegan
+          mountPath: /home/
+      volumes:
+        - name: cmvegan
+          configMap:
+            name: vegan-cm
+        - name: pvcvegan
+          {{- if not .Values.persistence.enable }}
+          emptyDir: { }
+          {{- end }}
+          {{- if .Values.persistence.enable }}
+          persistentVolumeClaim:
+          {{- toYaml .Values.persistence.persistentVolumeClaim | nindent 11 }}
+          {{- end }}

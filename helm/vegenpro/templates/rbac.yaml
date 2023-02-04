@@ -1,0 +1,30 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{include "veganpro.fullname" . }}
+  namespace: {{ .Values.namespace }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods","services","endpoints","namespaces","configmaps"]
+    verbs: ["get","list","watch","create","delete","update"]
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{include "veganpro.fullname" . }}
+  namespace: {{ .Values.namespace }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{include "veganpro.fullname" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{include "veganpro.fullname" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{include "veganpro.fullname" . }}
+  namespace: {{ .Values.namespace }}

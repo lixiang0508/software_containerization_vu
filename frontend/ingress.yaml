@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: veganpro-ingress
@@ -9,7 +9,10 @@ spec:
   rules:
   - http:
       paths:
-      - path: '/'
+      - path: /
+        pathType: Prefix
         backend:
-          serviceName: svcveganpro
-          servicePort: 80
+          service:
+           name: svcveganpro
+           port: 
+            number: 80

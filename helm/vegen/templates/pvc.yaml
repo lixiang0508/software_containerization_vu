@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vegan-pv
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "vegan.selectorLabels" . | nindent 4 }}
+spec:
+{{- toYaml .Values.persistence.data | nindent 2 }}
+ 

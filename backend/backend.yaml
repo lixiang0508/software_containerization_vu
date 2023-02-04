@@ -35,18 +35,18 @@ spec:
           tcpSocket:
             port: 8085 
           initialDelaySeconds: 110
-          timeoutSeconds: 120
+          timeoutSeconds: 240
           successThreshold: 1
           failureThreshold: 3
-          periodSeconds: 10
+          periodSeconds: 40
         readinessProbe: 
           tcpSocket:
             port: 8085  
           initialDelaySeconds: 110
-          timeoutSeconds: 120
+          timeoutSeconds: 240
           successThreshold: 1
           failureThreshold: 3
-          periodSeconds: 10
+          periodSeconds: 40
         ports:
         - containerPort: 8085
           name:  veganport
