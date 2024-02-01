@@ -1,7 +1,12 @@
 # software_containerization_vu
 1.Deploy Database (MySQL)
 
-1.1 kubectl apply -f 
+1.1 
+```
+kubectl apply -f 
+```
+
+’‘’
 cm.yaml  
 (Create configmap to deploy database configuration files)
 secret.yaml 
